@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Overview · Tabula{% endblock %}
+{% block content %}
+<section class="hero-section">
+  <div>
+    <p class="eyebrow">Working surface / 01</p>
+    <h1>Keep the record<br><em>closer than the narrative.</em></h1>
+    <p class="hero-copy">Tabula links financial claims to the evidence, revisions, citations, and eventual outcomes that give them meaning.</p>
+  </div>
+  <div class="hero-seal">
+    <span class="seal-ring"></span>
+    <span class="seal-label">observe<br>before<br>conclude</span>
+  </div>
+</section>
+<section class="metric-grid" aria-label="Ledger summary">
+  <div class="metric-card metric-card-dark">
+    <span class="metric-label">Total claims</span>
+    <strong>{{ claims|length }}</strong>
+    <span class="metric-foot">Across all tracked companies</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Open claims</span>
+    <strong>{{ counts.open }}</strong>
+    <span class="metric-foot">Awaiting resolution</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Evidence items</span>
+    <strong>{{ evidence_count }}</strong>
+    <span class="metric-foot">Citations and excerpts</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Observed outcomes</span>
+    <strong>{{ outcome_count }}</strong>
+    <span class="metric-foot">Post-claim checkpoints</span>
+  </div>
+</section>
+<section class="dashboard-grid">
+  <div class="panel panel-large">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Ledger / recent entries</p>
+        <h2>Claims in motion</h2>
+      </div>
+      <a class="text-link" href="/claims">View all <span>↗</span></a>
+    </div>
+    {% if claims %}
+    <div class="claim-table-wrap">
+      <table class="claim-table">
+        <thead><tr><th>Claim</th><th>Company</th><th>Status</th><th>Confidence</th><th></th></tr></thead>
+        <tbody>
+        {% for claim in claims[:8] %}
+          <tr>
+            <td><a class="table-title" href="/claims/{{ claim.id }}">{{ claim.title }}</a><span class="table-subtitle">{{ claim.statement|truncate(92) }}</span></td>
+            <td class="muted-cell">{{ claim.company }}</td>
+            <td><span class="status status-{{ claim.status.value }}">{{ claim.status.value }}</span></td>
+            <td><div class="confidence"><span class="confidence-bar"><i style="width: {{ claim.confidence }}%"></i></span><span>{{ claim.confidence }}%</span></div></td>
+            <td><a class="row-arrow" href="/claims/{{ claim.id }}">→</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><span class="empty-mark">∴</span><h3>No claims yet</h3><p>Start with a statement someone made and preserve the context around it.</p><a class="button button-dark" href="/claims/new">Create first claim</a></div>
+    {% endif %}
+  </div>
+  <div class="panel signal-panel">
+    <div class="panel-heading"><div><p class="eyebrow">Signal / distribution</p><h2>Claim states</h2></div></div>
+    <div class="state-list">
+      {% for state in ['open', 'supported', 'challenged', 'resolved'] %}
+      <div class="state-row"><span class="state-dot state-dot-{{ state }}"></span><span>{{ state|title }}</span><strong>{{ counts[state] }}</strong></div>
+      {% endfor %}
+    </div>
+    <div class="state-note"><span class="note-index">01</span><p>Repetition is not evidence. Every claim stays attached to its source trail.</p></div>
+  </div>
+</section>
+<section class="lower-grid">
+  <div class="quote-card"><span class="quote-mark">“</span><p>A claim becomes useful when its future can disagree with its past.</p><span class="quote-caption">TABULA PRINCIPLE / 001</span></div>
+  <div class="panel source-summary"><div class="panel-heading"><div><p class="eyebrow">Archive / source trail</p><h2>Sources indexed</h2></div><a class="text-link" href="/sources">Manage <span>↗</span></a></div><strong class="big-number">{{ source_count }}</strong><p class="muted-copy">Primary materials preserved for later inspection.</p></div>
+</section>
+{% endblock %}

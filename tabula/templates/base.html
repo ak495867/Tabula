@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tabula is a financial claims and evidence ledger.">
+  <title>{% block title %}Tabula{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/">
+        <span class="brand-mark">T</span>
+        <span>Tabula</span>
+      </a>
+      <p class="eyebrow sidebar-eyebrow">Evidence ledger</p>
+      <nav class="nav-list" aria-label="Primary navigation">
+        <a class="nav-link {% if request.url.path == '/' %}active{% endif %}" href="/">
+          <span class="nav-icon">⌂</span>
+          <span>Overview</span>
+        </a>
+        <a class="nav-link {% if request.url.path.startswith('/claims') %}active{% endif %}" href="/claims">
+          <span class="nav-icon">◎</span>
+          <span>Claims</span>
+        </a>
+        <a class="nav-link {% if request.url.path.startswith('/sources') %}active{% endif %}" href="/sources">
+          <span class="nav-icon">↗</span>
+          <span>Sources</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="mini-rule"></div>
+        <p class="sidebar-note">Track what was said.<br>Keep what was shown.<br>Observe what happened.</p>
+        <span class="version-label">TABULA / 0.1.0</span>
+      </div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Financial claims and evidence ledger</p>
+          <p class="topbar-context">A record for assertions, sources, revisions, and outcomes</p>
+        </div>
+        <a class="button button-dark" href="/claims/new"><span>+</span> New claim</a>
+      </header>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{{ url_for('static', path='app.js') }}"></script>
+</body>
+</html>
