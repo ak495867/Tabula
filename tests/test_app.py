@@ -57,5 +57,5 @@ def test_json_api_claims(tmp_path, monkeypatch):
 
         records = client.get("/api/claims")
         assert records.status_code == 200
-        assert records.json()[0]["company"] == "Northstar"
-        assert records.json()[0]["evidence_count"] == 0
+        assert records.json()["items"][0]["company"] == "Northstar"
+        assert records.json()["items"][0]["evidence_count"] == 0

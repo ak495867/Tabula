@@ -3,8 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
-from sqlalchemy import Enum as SqlEnum
+from sqlalchemy import CheckConstraint, DateTime, Enum as SQLEnum, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from tabula.database import Base
@@ -47,19 +46,24 @@ class Source(Base):
 class Claim(Base):
     __tablename__ = "claims"
 
+    __table_args__ = (
+        CheckConstraint("confidence >= 0 AND confidence <= 100", name="confidence_range"),
+        {"extend_existing": True},
+    )
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    company: Mapped[str] = mapped_column(String(160))
+    company: Mapped[str] = mapped_column(String(160), index=True)
     title: Mapped[str] = mapped_column(String(240))
     statement: Mapped[str] = mapped_column(Text)
     status: Mapped[ClaimStatus] = mapped_column(
-        SqlEnum(ClaimStatus), default=ClaimStatus.open
+        SQLEnum(ClaimStatus), default=ClaimStatus.open, index=True
     )
     confidence: Mapped[int] = mapped_column(Integer, default=50)
     owner: Mapped[str] = mapped_column(String(120), default="")
     first_seen_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), onupdate=func.now()
+        DateTime, server_default=func.now(), onupdate=func.now(), index=True
     )
     evidence: Mapped[list[Evidence]] = relationship(
         back_populates="claim", cascade="all, delete-orphan"
@@ -85,7 +89,7 @@ class Evidence(Base):
         ForeignKey("sources.id", ondelete="SET NULL"), nullable=True
     )
     kind: Mapped[EvidenceKind] = mapped_column(
-        SqlEnum(EvidenceKind), default=EvidenceKind.excerpt
+        SQLEnum(EvidenceKind), default=EvidenceKind.excerpt
     )
     label: Mapped[str] = mapped_column(String(180))
     excerpt: Mapped[str] = mapped_column(Text, default="")
@@ -113,7 +117,7 @@ class Outcome(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id", ondelete="CASCADE"))
     status: Mapped[OutcomeStatus] = mapped_column(
-        SqlEnum(OutcomeStatus), default=OutcomeStatus.pending
+        SQLEnum(OutcomeStatus), default=OutcomeStatus.pending
     )
     observed_at: Mapped[datetime] = mapped_column(DateTime)
     summary: Mapped[str] = mapped_column(Text)
